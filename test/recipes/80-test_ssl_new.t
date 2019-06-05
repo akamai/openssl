@@ -36,7 +36,7 @@ map { s/\^// } @conf_files if $^O eq "VMS";
 
 # We hard-code the number of tests to double-check that the globbing above
 # finds all files as expected.
-plan tests => 30 # = scalar @conf_srcs
+plan tests => 31 # = scalar @conf_srcs
               + ($no_fips ? 0 : 1); # fipsinstall
 
 # Some test results depend on the configuration of enabled protocols. We only
@@ -80,6 +80,7 @@ my %conf_dependent_tests = (
   "27-ticket-appdata.cnf" => !$is_default_tls,
   "28-seclevel.cnf" => disabled("tls1_2") || $no_ec,
   "30-extended-master-secret.cnf" => disabled("tls1_2"),
+  "31-compressed-certificate.cnf" => disabled("comp"),
 );
 
 # Add your test here if it should be skipped for some compile-time

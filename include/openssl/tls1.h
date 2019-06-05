@@ -136,6 +136,9 @@ extern "C" {
 /* ExtensionType value from RFC7627 */
 # define TLSEXT_TYPE_extended_master_secret      23
 
+/* ExtensionType value from draft-ietf-tls-certificate-compression-05 */
+# define TLSEXT_TYPE_compress_certificate        27
+
 /* ExtensionType value from RFC4507 */
 # define TLSEXT_TYPE_session_ticket              35
 
@@ -196,6 +199,12 @@ extern "C" {
 /* Total number of different digest algorithms */
 
 # define TLSEXT_hash_num                                 10
+
+/* draft-ietf-tls-certificate-compression-05 */
+# define TLSEXT_comp_cert_none                            0
+# define TLSEXT_comp_cert_zlib                            1
+# define TLSEXT_comp_cert_brotli                          2
+# define TLSEXT_comp_cert_zstd                            3
 
 /* Flag set for unrecognised algorithms */
 # define TLSEXT_nid_unknown                              0x1000000

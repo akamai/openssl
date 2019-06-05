@@ -204,6 +204,15 @@ RFC7366 Encrypt-then-MAC option on TLS and DTLS connection.
 If this option is set, Encrypt-then-MAC is disabled. Clients will not
 propose, and servers will not accept the extension.
 
+=item SSL_OP_NO_CERTIFICATE_COMPRESSION
+
+Normally clients and servers will transparently attempt to negotiate the
+draft-ietf-tls-certificate-compression option on TLSv1.3 connections.
+
+If this option is set, certificate compression is disabled. The extension
+will not be sent by either client or server, and will be ignored upon
+receipt.
+
 =item SSL_OP_NO_EXTENDED_MASTER_SECRET
 
 Normally clients and servers will transparently attempt to negotiate the

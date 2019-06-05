@@ -23,6 +23,11 @@ OpenSSL 3.0
 
 ### Changes between 1.1.1 and 3.0 [xx XXX xxxx]
 
+ * Added support for certificate compression (RFCxxxx), including
+   library support for Brotli and Zstandard compression.
+
+   *Todd Short*
+
  * The -cipher-commands and -digest-commands options of the command line
    utility list has been deprecated.
    Instead use the -cipher-algorithms and -digest-algorithms options.
