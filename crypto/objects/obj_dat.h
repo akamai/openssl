@@ -1103,7 +1103,7 @@ static const unsigned char so[7947] = {
     0x2A,0x85,0x03,0x64,0x71,0x06,                 /* [ 7940] OBJ_classSignToolKA1 */
 };
 
-#define NUM_NID 1234
+#define NUM_NID 1235
 static const ASN1_OBJECT nid_objs[NUM_NID] = {
     {"UNDEF", "undefined", NID_undef},
     {"rsadsi", "RSA Data Security, Inc.", NID_rsadsi, 6, &so[0]},
@@ -2339,9 +2339,10 @@ static const ASN1_OBJECT nid_objs[NUM_NID] = {
     {"classSignToolKB1", "Class of Signing Tool KB1", NID_classSignToolKB1, 6, &so[7928]},
     {"classSignToolKB2", "Class of Signing Tool KB2", NID_classSignToolKB2, 6, &so[7934]},
     {"classSignToolKA1", "Class of Signing Tool KA1", NID_classSignToolKA1, 6, &so[7940]},
+    {"brotli", "Brotli compression", NID_brotli},
 };
 
-#define NUM_SN 1225
+#define NUM_SN 1226
 static const unsigned int sn_objs[NUM_SN] = {
      364,    /* "AD_DVCS" */
      419,    /* "AES-128-CBC" */
@@ -2423,6 +2424,7 @@ static const unsigned int sn_objs[NUM_SN] = {
     1202,    /* "BLAKE2SMAC" */
     1056,    /* "BLAKE2b512" */
     1057,    /* "BLAKE2s256" */
+    1234,    /* "BROTLI" */
       14,    /* "C" */
      751,    /* "CAMELLIA-128-CBC" */
      962,    /* "CAMELLIA-128-CCM" */
@@ -3570,7 +3572,7 @@ static const unsigned int sn_objs[NUM_SN] = {
     1093,    /* "x509ExtAdmission" */
 };
 
-#define NUM_LN 1225
+#define NUM_LN 1226
 static const unsigned int ln_objs[NUM_LN] = {
      363,    /* "AD Time Stamping" */
      405,    /* "ANSI X9.62" */
@@ -3906,6 +3908,7 @@ static const unsigned int ln_objs[NUM_LN] = {
      932,    /* "brainpoolP384t1" */
      933,    /* "brainpoolP512r1" */
      934,    /* "brainpoolP512t1" */
+    1234,    /* "brotli" */
      494,    /* "buildingName" */
      860,    /* "businessCategory" */
      691,    /* "c2onb191v4" */

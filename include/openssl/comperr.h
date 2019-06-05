@@ -24,6 +24,10 @@
  * COMP function codes.
  */
 #  ifndef OPENSSL_NO_DEPRECATED_3_0
+#   define COMP_F_BIO_BROTLI_FLUSH                          0
+#   define COMP_F_BIO_BROTLI_NEW                            0
+#   define COMP_F_BIO_BROTLI_READ                           0
+#   define COMP_F_BIO_BROTLI_WRITE                          0
 #   define COMP_F_BIO_ZLIB_FLUSH                            0
 #   define COMP_F_BIO_ZLIB_NEW                              0
 #   define COMP_F_BIO_ZLIB_READ                             0
@@ -34,6 +38,11 @@
 /*
  * COMP reason codes.
  */
+#  define COMP_R_BROTLI_DECODE_ERROR                       102
+#  define COMP_R_BROTLI_DEFLATE_ERROR                      103
+#  define COMP_R_BROTLI_ENCODE_ERROR                       106
+#  define COMP_R_BROTLI_INFLATE_ERROR                      104
+#  define COMP_R_BROTLI_NOT_SUPPORTED                      105
 #  define COMP_R_ZLIB_DEFLATE_ERROR                        99
 #  define COMP_R_ZLIB_INFLATE_ERROR                        100
 #  define COMP_R_ZLIB_NOT_SUPPORTED                        101

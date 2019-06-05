@@ -130,6 +130,10 @@ int enc_main(int argc, char **argv)
     int do_zlib = 0;
     BIO *bzl = NULL;
 #endif
+#ifdef BROTLI
+    int do_brotli = 0;
+    BIO *bbrot = NULL;
+#endif
 
     /* first check the program name */
     prog = opt_progname(argv[0]);
@@ -138,6 +142,10 @@ int enc_main(int argc, char **argv)
 #ifdef ZLIB
     } else if (strcmp(prog, "zlib") == 0) {
         do_zlib = 1;
+#endif
+#ifdef BROTLI
+    } else if (strcmp(prog, "brotli") == 0) {
+        do_brotli = 1;
 #endif
     } else {
         cipher = EVP_get_cipherbyname(prog);
@@ -326,12 +334,15 @@ int enc_main(int argc, char **argv)
 #ifdef ZLIB
     if (!do_zlib)
 #endif
-        if (base64) {
-            if (enc)
-                outformat = FORMAT_BASE64;
-            else
-                informat = FORMAT_BASE64;
-        }
+#ifdef BROTLI
+        if (!do_brotli)
+#endif
+            if (base64) {
+                if (enc)
+                    outformat = FORMAT_BASE64;
+                else
+                    informat = FORMAT_BASE64;
+            }
 
     strbuf = app_malloc(SIZE, "strbuf");
     buff = app_malloc(EVP_ENCODE_LENGTH(bsize), "evp buffer");
@@ -409,6 +420,21 @@ int enc_main(int argc, char **argv)
             wbio = BIO_push(bzl, wbio);
         else
             rbio = BIO_push(bzl, rbio);
+    }
+#endif
+
+#ifdef BROTLI
+    if (do_brotli) {
+        if ((bbrot = BIO_new(BIO_f_brotli())) == NULL)
+            goto end;
+        if (debug) {
+            BIO_set_callback(bbrot, BIO_debug_callback);
+            BIO_set_callback_arg(bbrot, (char *)bio_err);
+        }
+        if (enc)
+            wbio = BIO_push(bbrot, wbio);
+        else
+            rbio = BIO_push(bbrot, rbio);
     }
 #endif
 
@@ -633,6 +659,9 @@ int enc_main(int argc, char **argv)
     BIO_free(b64);
 #ifdef ZLIB
     BIO_free(bzl);
+#endif
+#ifdef BROTLI
+    BIO_free(bbrot);
 #endif
     release_engine(e);
     OPENSSL_free(pass);

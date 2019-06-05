@@ -10,3 +10,4 @@
 #include <openssl/comp.h>
 
 void comp_zlib_cleanup_int(void);
+void comp_brotli_cleanup_int(void);

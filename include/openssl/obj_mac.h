@@ -5369,6 +5369,10 @@
 #define LN_aes_256_siv          "aes-256-siv"
 #define NID_aes_256_siv         1200
 
+#define SN_brotli               "BROTLI"
+#define LN_brotli               "brotli"
+#define NID_brotli              1234
+
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 
 #define SN_id_tc26_cipher_gostr3412_2015_magma_ctracpkm                 SN_magma_ctr_acpkm
