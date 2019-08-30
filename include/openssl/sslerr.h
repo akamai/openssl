@@ -97,6 +97,7 @@ int ERR_load_SSL_strings(void);
 #  define SSL_F_PITEM_NEW                                  0
 #  define SSL_F_PQUEUE_NEW                                 0
 #  define SSL_F_PROCESS_KEY_SHARE_EXT                      0
+#  define SSL_F_QUIC_CHANGE_CIPHER_STATE                   0
 #  define SSL_F_QUIC_GET_MESSAGE                           0
 #  define SSL_F_QUIC_SET_ENCRYPTION_SECRETS                0
 #  define SSL_F_READ_STATE_MACHINE                         0
