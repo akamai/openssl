@@ -32,6 +32,10 @@
 #   define COMP_F_BIO_ZLIB_NEW                              0
 #   define COMP_F_BIO_ZLIB_READ                             0
 #   define COMP_F_BIO_ZLIB_WRITE                            0
+#   define COMP_F_BIO_ZSTD_FLUSH                            0
+#   define COMP_F_BIO_ZSTD_NEW                              0
+#   define COMP_F_BIO_ZSTD_READ                             0
+#   define COMP_F_BIO_ZSTD_WRITE                            0
 #   define COMP_F_COMP_CTX_NEW                              0
 #  endif
 
@@ -46,6 +50,10 @@
 #  define COMP_R_ZLIB_DEFLATE_ERROR                        99
 #  define COMP_R_ZLIB_INFLATE_ERROR                        100
 #  define COMP_R_ZLIB_NOT_SUPPORTED                        101
+#  define COMP_R_ZSTD_COMPRESS_ERROR                       107
+#  define COMP_R_ZSTD_DECODE_ERROR                         108
+#  define COMP_R_ZSTD_DECOMPRESS_ERROR                     109
+#  define COMP_R_ZSTD_NOT_SUPPORTED                        110
 
 # endif
 #endif

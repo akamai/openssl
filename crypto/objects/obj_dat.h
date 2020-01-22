@@ -1103,7 +1103,7 @@ static const unsigned char so[7947] = {
     0x2A,0x85,0x03,0x64,0x71,0x06,                 /* [ 7940] OBJ_classSignToolKA1 */
 };
 
-#define NUM_NID 1235
+#define NUM_NID 1236
 static const ASN1_OBJECT nid_objs[NUM_NID] = {
     {"UNDEF", "undefined", NID_undef},
     {"rsadsi", "RSA Data Security, Inc.", NID_rsadsi, 6, &so[0]},
@@ -2340,9 +2340,10 @@ static const ASN1_OBJECT nid_objs[NUM_NID] = {
     {"classSignToolKB2", "Class of Signing Tool KB2", NID_classSignToolKB2, 6, &so[7934]},
     {"classSignToolKA1", "Class of Signing Tool KA1", NID_classSignToolKA1, 6, &so[7940]},
     {"brotli", "Brotli compression", NID_brotli},
+    {"zstd", "Zstandard compression", NID_zstd},
 };
 
-#define NUM_SN 1226
+#define NUM_SN 1227
 static const unsigned int sn_objs[NUM_SN] = {
      364,    /* "AD_DVCS" */
      419,    /* "AES-128-CBC" */
@@ -2424,7 +2425,6 @@ static const unsigned int sn_objs[NUM_SN] = {
     1202,    /* "BLAKE2SMAC" */
     1056,    /* "BLAKE2b512" */
     1057,    /* "BLAKE2s256" */
-    1234,    /* "BROTLI" */
       14,    /* "C" */
      751,    /* "CAMELLIA-128-CBC" */
      962,    /* "CAMELLIA-128-CCM" */
@@ -2686,6 +2686,7 @@ static const unsigned int sn_objs[NUM_SN] = {
      932,    /* "brainpoolP384t1" */
      933,    /* "brainpoolP512r1" */
      934,    /* "brainpoolP512t1" */
+    1234,    /* "brotli" */
      494,    /* "buildingName" */
      860,    /* "businessCategory" */
      691,    /* "c2onb191v4" */
@@ -3570,9 +3571,10 @@ static const unsigned int sn_objs[NUM_SN] = {
      158,    /* "x509Certificate" */
      160,    /* "x509Crl" */
     1093,    /* "x509ExtAdmission" */
+    1235,    /* "zstd" */
 };
 
-#define NUM_LN 1226
+#define NUM_LN 1227
 static const unsigned int ln_objs[NUM_LN] = {
      363,    /* "AD Time Stamping" */
      405,    /* "ANSI X9.62" */
@@ -3584,6 +3586,7 @@ static const unsigned int ln_objs[NUM_LN] = {
      365,    /* "Basic OCSP Response" */
      285,    /* "Biometric Info" */
     1221,    /* "Brand Indicator for Message Identification" */
+    1234,    /* "Brotli compression" */
      179,    /* "CA Issuers" */
      785,    /* "CA Repository" */
     1219,    /* "CMC Archive Server" */
@@ -3796,6 +3799,7 @@ static const unsigned int ln_objs[NUM_LN] = {
      184,    /* "X9.57" */
      185,    /* "X9.57 CM ?" */
     1209,    /* "XmppAddr" */
+    1235,    /* "Zstandard compression" */
      478,    /* "aRecord" */
      289,    /* "aaControls" */
      287,    /* "ac-auditEntity" */
@@ -3908,7 +3912,6 @@ static const unsigned int ln_objs[NUM_LN] = {
      932,    /* "brainpoolP384t1" */
      933,    /* "brainpoolP512r1" */
      934,    /* "brainpoolP512t1" */
-    1234,    /* "brotli" */
      494,    /* "buildingName" */
      860,    /* "businessCategory" */
      691,    /* "c2onb191v4" */

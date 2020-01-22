@@ -27,7 +27,7 @@ use OpenSSL::config;
 my $orig_death_handler = $SIG{__DIE__};
 $SIG{__DIE__} = \&death_handler;
 
-my $usage="Usage: Configure [no-<cipher> ...] [enable-<cipher> ...] [-Dxxx] [-lxxx] [-Lxxx] [-fxxx] [-Kxxx] [no-hw-xxx|no-hw] [[no-]threads] [[no-]shared] [[no-]zlib|zlib-dynamic] [[no-]brotli|brotli-dynamic] [no-asm] [no-egd] [sctp] [386] [--prefix=DIR] [--openssldir=OPENSSLDIR] [--with-xxx[=vvv]] [--config=FILE] os/compiler[:flags]\n";
+my $usage="Usage: Configure [no-<cipher> ...] [enable-<cipher> ...] [-Dxxx] [-lxxx] [-Lxxx] [-fxxx] [-Kxxx] [no-hw-xxx|no-hw] [[no-]threads] [[no-]shared] [[no-]zlib|zlib-dynamic] [[no-]brotli|brotli-dynamic] [[no-]zstd|zstd-dynamic] [no-asm] [no-egd] [sctp] [386] [--prefix=DIR] [--openssldir=OPENSSLDIR] [--with-xxx[=vvv]] [--config=FILE] os/compiler[:flags]\n";
 
 # Options:
 #
@@ -71,6 +71,9 @@ my $usage="Usage: Configure [no-<cipher> ...] [enable-<cipher> ...] [-Dxxx] [-lx
 # [no-]brotli   [don't] compile support for brotli compression.
 # brotli-dynamic
 #               Like "brotli", but the brotli library is expected to be a shared
+#               library and will be loaded in run-time by the OpenSSL library.
+# [no-]zstd     [don't] compile support for zstd compression.
+# zstd-dynamic  Like "zstd", but the zstd library is expected to be a shared
 #               library and will be loaded in run-time by the OpenSSL library.
 # sctp          include SCTP support
 # no-uplink     Don't build support for UPLINK interface.
@@ -488,6 +491,8 @@ my @disablables = (
     "weak-ssl-ciphers",
     "zlib",
     "zlib-dynamic",
+    "zstd",
+    "zstd-dynamic",
     );
 foreach my $proto ((@tls, @dtls))
         {
@@ -542,6 +547,8 @@ our %disabled = ( # "what"         => "comment"
                   "weak-ssl-ciphers"    => "default",
                   "zlib"                => "default",
                   "zlib-dynamic"        => "default",
+                  "zstd"                => "default",
+                  "zstd-dynamic"        => "default",
                   "ktls"                => "default",
                 );
 
@@ -570,6 +577,7 @@ my @disable_cascades = (
     "ssl3-method"       => [ "ssl3" ],
     "zlib"              => [ "zlib-dynamic" ],
     "brotli"            => [ "brotli-dynamic" ],
+    "zstd"              => [ "zstd-dynamic" ],
     "des"               => [ "mdc2" ],
     "ec"                => [ "ec2m", "ecdsa", "ecdh", "sm2", "gost" ],
     sub { $disabled{"ec"} && $disabled{"dh"} }
@@ -616,7 +624,7 @@ my @disable_cascades = (
     "stdio"             => [ "apps", "capieng", "egd" ],
     "apps"              => [ "tests" ],
     "tests"             => [ "external-tests" ],
-    "comp"              => [ "zlib", "brotli" ],
+    "comp"              => [ "zlib", "brotli", "zstd" ],
     "sm3"               => [ "sm2" ],
     sub { !$disabled{"unit-test"} } => [ "heartbeats" ],
 
@@ -789,6 +797,8 @@ while (@argvcopy)
         s /^zlib-dynamic$/enable-zlib-dynamic/;
         s /^brotli$/enable-brotli/;
         s /^brotli-dynamic$/enable-brotli-dynamic/;
+        s /^zstd$/enable-zstd/;
+        s /^zstd-dynamic$/enable-zstd-dynamic/;
 
         if (/^(no|disable|enable)-(.+)$/)
                 {
@@ -877,6 +887,10 @@ while (@argvcopy)
                 elsif ($1 eq "brotli-dynamic")
                         {
                         delete $disabled{"brotli"};
+                        }
+                elsif ($1 eq "zstd-dynamic")
+                        {
+                        delete $disabled{"zstd"};
                         }
                 my $algo = $1;
                 delete $disabled{$algo};
@@ -969,6 +983,14 @@ while (@argvcopy)
                 elsif (/^--with-brotli-include=(.*)$/)
                         {
                         $withargs{brotli_include}=$1;
+                        }
+                elsif (/^--with-zstd-lib=(.*)$/)
+                        {
+                        $withargs{zstd_lib}=$1;
+                        }
+                elsif (/^--with-zstd-include=(.*)$/)
+                        {
+                        $withargs{zstd_include}=$1;
                         }
                 elsif (/^--with-fuzzer-lib=(.*)$/)
                         {
@@ -1804,7 +1826,7 @@ foreach my $what (sort keys %disabled) {
 
     if (!grep { $what eq $_ } ( 'buildtest-c++', 'fips', 'threads', 'shared',
                                 'module', 'pic', 'dynamic-engine', 'makedepend',
-                                'brotli-dynamic', 'brotli',
+                                'brotli-dynamic', 'brotli', "zstd-dynamic", "zstd",
                                 'zlib-dynamic', 'zlib', 'sse2', 'legacy' )) {
         (my $WHAT = uc $what) =~ s|-|_|g;
         my $skipdir = $what;

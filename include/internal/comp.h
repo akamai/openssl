@@ -11,3 +11,4 @@
 
 void comp_zlib_cleanup_int(void);
 void comp_brotli_cleanup_int(void);
+void comp_zstd_cleanup_int(void);
