@@ -54,7 +54,7 @@ int ssl3_do_write(SSL *s, int type)
             if (!ret) {
                 ret = -1;
                 /* QUIC can't sent anything out sice the above failed */
-                SSLerr(SSL_F_SSL3_DO_WRITE, SSL_R_INTERNAL_ERROR);
+                SSLerr(SSL_F_SSL3_DO_WRITE, ERR_R_INTERNAL_ERROR);
             } else {
                 written = s->init_num;
             }

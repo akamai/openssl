@@ -197,7 +197,6 @@ static const ERR_STRING_DATA SSL_str_reasons[] = {
     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_INCONSISTENT_EXTMS), "inconsistent extms"},
     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_INSUFFICIENT_SECURITY),
     "insufficient security"},
-    {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_INTERNAL_ERROR), "internal error"},
     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_INVALID_ALERT), "invalid alert"},
     {ERR_PACK(ERR_LIB_SSL, 0, SSL_R_INVALID_CCS_MESSAGE),
     "invalid ccs message"},

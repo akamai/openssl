@@ -1325,7 +1325,6 @@ SSL_R_INCONSISTENT_EARLY_DATA_ALPN:222:inconsistent early data alpn
 SSL_R_INCONSISTENT_EARLY_DATA_SNI:231:inconsistent early data sni
 SSL_R_INCONSISTENT_EXTMS:104:inconsistent extms
 SSL_R_INSUFFICIENT_SECURITY:241:insufficient security
-SSL_R_INTERNAL_ERROR:305:internal error
 SSL_R_INVALID_ALERT:205:invalid alert
 SSL_R_INVALID_CCS_MESSAGE:260:invalid ccs message
 SSL_R_INVALID_CERTIFICATE_OR_ALG:238:invalid certificate or alg
@@ -1504,7 +1503,7 @@ SSL_R_VERSION_TOO_LOW:396:version too low
 SSL_R_WRONG_CERTIFICATE_TYPE:383:wrong certificate type
 SSL_R_WRONG_CIPHER_RETURNED:261:wrong cipher returned
 SSL_R_WRONG_CURVE:378:wrong curve
-SSL_R_WRONG_ENCRYPTION_LEVEL_RECEIVED:310:wrong encryption level received
+SSL_R_WRONG_ENCRYPTION_LEVEL_RECEIVED:800:wrong encryption level received
 SSL_R_WRONG_SIGNATURE_LENGTH:264:wrong signature length
 SSL_R_WRONG_SIGNATURE_SIZE:265:wrong signature size
 SSL_R_WRONG_SIGNATURE_TYPE:370:wrong signature type
