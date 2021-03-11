@@ -595,6 +595,8 @@ struct ssl_session_st {
     CRYPTO_REF_COUNT references;
     time_t timeout;
     time_t time;
+    time_t calc_timeout;
+    int    timeout_ovf;
     unsigned int compress_meth; /* Need to lookup the method */
     const SSL_CIPHER *cipher;
     unsigned long cipher_id;    /* when ASN.1 loaded, this needs to be used to
@@ -2836,6 +2838,8 @@ int ssl_srp_ctx_init_intern(SSL *s);
 
 int ssl_srp_calc_a_param_intern(SSL *s);
 int ssl_srp_server_param_with_username_intern(SSL *s, int *ad);
+
+void ssl_session_calculate_timeout(SSL_SESSION* ss);
 
 # else /* OPENSSL_UNIT_TEST */
 

@@ -304,6 +304,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
         ret->timeout = (time_t)as->timeout;
     else
         ret->timeout = 3;
+    ssl_session_calculate_timeout(ret);
 
     X509_free(ret->peer);
     ret->peer = as->peer;

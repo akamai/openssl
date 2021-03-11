@@ -20,8 +20,54 @@ static void SSL_SESSION_list_remove(SSL_CTX *ctx, SSL_SESSION *s);
 static void SSL_SESSION_list_add(SSL_CTX *ctx, SSL_SESSION *s);
 static int remove_session_lock(SSL_CTX *ctx, SSL_SESSION *c, int lck);
 
-#define SESS_TIMEOUT(s) ((s)->time + (s)->timeout)
 DEFINE_STACK_OF(SSL_SESSION)
+
+__owur static int sess_timedout(time_t t, SSL_SESSION *ss)
+{
+    /* if timeout overflowed, it can never timeout! */
+    if (ss->timeout_ovf)
+        return 0;
+    return t > ss->calc_timeout;
+}
+
+/*
+ * Returns -1/0/+1 as other XXXcmp-type functions
+ * Takes overflow of calculated timeout into consideration
+ */
+__owur static int timeoutcmp(SSL_SESSION *a, SSL_SESSION *b)
+{
+    /* if only one overflowed, then it is greater */
+    if (a->timeout_ovf && !b->timeout_ovf)
+        return 1;
+    if (!a->timeout_ovf && b->timeout_ovf)
+        return -1;
+    /* No overflow, or both overflowed, so straight compare is safe */
+    if (a->calc_timeout < b->calc_timeout)
+        return -1;
+    if (a->calc_timeout > b->calc_timeout)
+        return 1;
+    return 0;
+}
+
+/* Calculates effective timeout, saving overflow state */
+void ssl_session_calculate_timeout(SSL_SESSION *ss)
+{
+    /* Force positive timeout */
+    if (ss->timeout < 0)
+        ss->timeout = 0;
+    ss->calc_timeout = ss->time + ss->timeout;
+    /*
+     * |timeout| is always zero or positive, so the check for
+     * overflow only needs to consider if |time| is positive
+     */
+    ss->timeout_ovf = ss->time > 0 && ss->calc_timeout < ss->time;
+    /*
+     * N.B. Realistic overflow can only occur in our lifetimes on a
+     *      32-bit machine in January 2038.
+     *      However, There are no controls to limit the |timeout|
+     *      value, except to keep it positive.
+     */
+}
 
 /*
  * SSL_get_session() and SSL_get1_session() are problematic in TLS1.3 because,
@@ -82,6 +128,7 @@ SSL_SESSION *SSL_SESSION_new(void)
     ss->references = 1;
     ss->timeout = 60 * 5 + 4;   /* 5 minute timeout by default */
     ss->time = time(NULL);
+    ssl_session_calculate_timeout(ss);
     ss->lock = CRYPTO_THREAD_lock_new();
     if (ss->lock == NULL) {
         ERR_raise(ERR_LIB_SSL, ERR_R_MALLOC_FAILURE);
@@ -578,7 +625,7 @@ int ssl_get_prev_session(SSL *s, CLIENTHELLO_MSG *hello)
         goto err;
     }
 
-    if (ret->timeout < (time(NULL) - ret->time)) { /* timeout */
+    if (sess_timedout(time(NULL), ret)) {
         tsan_counter(&s->session_ctx->stats.sess_timeout);
         if (try_session_cache) {
             /* session was from the cache, so remove it */
@@ -677,8 +724,10 @@ int SSL_CTX_add_session(SSL_CTX *ctx, SSL_SESSION *c)
     }
 
     /* Adjust last used time, and add back into the cache at the appropriate spot */
-    if (ctx->session_cache_mode & SSL_SESS_CACHE_UPDATE_TIME)
+    if (ctx->session_cache_mode & SSL_SESS_CACHE_UPDATE_TIME) {
         c->time = time(NULL);
+        ssl_session_calculate_timeout(c);
+    }
     SSL_SESSION_list_add(ctx, c);
 
     if (s != NULL) {
@@ -820,10 +869,13 @@ int SSL_SESSION_set1_id(SSL_SESSION *s, const unsigned char *sid,
 
 long SSL_SESSION_set_timeout(SSL_SESSION *s, long t)
 {
-    if (s == NULL)
+    time_t new_timeout = (time_t)t;
+
+    if (s == NULL || t < 0)
         return 0;
-    if (s->timeout != t) {
-        s->timeout = t;
+    if (s->timeout != new_timeout) {
+        s->timeout = new_timeout;
+        ssl_session_calculate_timeout(s);
         if (s->owner != NULL) {
             CRYPTO_THREAD_write_lock(s->owner->lock);
             SSL_SESSION_list_add(s->owner, s);
@@ -855,6 +907,7 @@ long SSL_SESSION_set_time(SSL_SESSION *s, long t)
         return 0;
     if (s->time != new_time) {
         s->time = new_time;
+        ssl_session_calculate_timeout(s);
         if (s->owner != NULL) {
             CRYPTO_THREAD_write_lock(s->owner->lock);
             SSL_SESSION_list_add(s->owner, s);
@@ -1075,7 +1128,7 @@ void SSL_CTX_flush_sessions(SSL_CTX *s, long t)
      */
     while (s->session_cache_tail != NULL) {
         current = s->session_cache_tail;
-        if (t == 0 || t > SESS_TIMEOUT(current)) {
+        if (t == 0 || sess_timedout((time_t)t, current)) {
             lh_SSL_SESSION_delete(s->sessions, current);
             SSL_SESSION_list_remove(s, current);
             current->not_resumable = 1;
@@ -1088,9 +1141,8 @@ void SSL_CTX_flush_sessions(SSL_CTX *s, long t)
              * pointers. If the stack failed to create, or the session
              * couldn't be put on the stack, just free it here
              */
-            if (sk != NULL && sk_SSL_SESSION_push(sk, current))
-                current = NULL;
-            SSL_SESSION_free(current);
+            if (sk == NULL || !sk_SSL_SESSION_push(sk, current))
+                SSL_SESSION_free(current);
         } else {
             break;
         }
@@ -1147,7 +1199,6 @@ static void SSL_SESSION_list_remove(SSL_CTX *ctx, SSL_SESSION *s)
 static void SSL_SESSION_list_add(SSL_CTX *ctx, SSL_SESSION *s)
 {
     SSL_SESSION *next;
-    time_t t;
 
     if ((s->next != NULL) && (s->prev != NULL))
         SSL_SESSION_list_remove(ctx, s);
@@ -1158,8 +1209,7 @@ static void SSL_SESSION_list_add(SSL_CTX *ctx, SSL_SESSION *s)
         s->prev = (SSL_SESSION *)&(ctx->session_cache_head);
         s->next = (SSL_SESSION *)&(ctx->session_cache_tail);
     } else {
-        t = SESS_TIMEOUT(s);
-        if (t >= SESS_TIMEOUT(ctx->session_cache_head)) {
+        if (timeoutcmp(s, ctx->session_cache_head) >= 0) {
             /*
              * if we timeout after (or the same time as) the first
              * session, put us first - usual case
@@ -1168,7 +1218,7 @@ static void SSL_SESSION_list_add(SSL_CTX *ctx, SSL_SESSION *s)
             s->next->prev = s;
             s->prev = (SSL_SESSION *)&(ctx->session_cache_head);
             ctx->session_cache_head = s;
-        } else if (t < SESS_TIMEOUT(ctx->session_cache_tail)) {
+        } else if (timeoutcmp(s, ctx->session_cache_tail) < 0) {
             /* if we timeout before the last session, put us last */
             s->prev = ctx->session_cache_tail;
             s->prev->next = s;
@@ -1181,7 +1231,7 @@ static void SSL_SESSION_list_add(SSL_CTX *ctx, SSL_SESSION *s)
              */
             next = ctx->session_cache_head->next;
             while (next != (SSL_SESSION*)&(ctx->session_cache_tail)) {
-                if (t >= SESS_TIMEOUT(next)) {
+                if (timeoutcmp(s, next) >= 0) {
                     s->next = next;
                     s->prev = next->prev;
                     next->prev->next = s;
