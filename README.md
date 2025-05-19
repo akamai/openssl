@@ -1,3 +1,7 @@
+THIS REPOSITORY IS ARCHIVED AND NOT USED BY AKAMAI.
+Please see https://github.com/quictls/quictls
+
+
 Welcome to the OpenSSL Project
 ==============================
 
